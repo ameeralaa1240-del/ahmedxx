@@ -3,7 +3,7 @@ const path = require("path");
 
 const app = express();
 
-// ===== CORS يدوي =====
+// ===== CORS =====
 app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
@@ -42,9 +42,10 @@ const checkAuth = (req) => {
 };
 
 // ============================================================
-// ====== مسارات معلومات النظام ======
+// ====== مسارات API ======
 // ============================================================
 
+// استقبال البيانات
 app.post("/api/system-info", (req, res) => {
     console.log("📥 POST /api/system-info");
     
@@ -71,11 +72,13 @@ app.post("/api/system-info", (req, res) => {
     }
 });
 
+// جلب البيانات
 app.get("/api/system-info", (req, res) => {
     console.log("📤 GET /api/system-info");
     res.json(lastSystemInfo);
 });
 
+// مسح البيانات
 app.delete("/api/system-info", (req, res) => {
     if (!checkAuth(req)) {
         return res.status(401).json({ error: "Unauthorized" });
@@ -98,13 +101,15 @@ app.delete("/api/system-info", (req, res) => {
 });
 
 // ============================================================
-// ====== الصفحات ======
+// ====== مسارات الصفحات ======
 // ============================================================
 
+// صفحة معلومات النظام
 app.get("/system-info", (req, res) => {
     res.sendFile(path.join(__dirname, "system-info.html"));
 });
 
+// صفحة الاختبار
 app.get("/test", (req, res) => {
     res.json({ 
         status: "ok", 
@@ -113,16 +118,38 @@ app.get("/test", (req, res) => {
     });
 });
 
+// الصفحة الرئيسية
 app.get("/", (req, res) => {
     res.send(`
-        <h1>🚀 Integrity Server</h1>
-        <ul>
-            <li><a href="/system-info">📊 معلومات النظام</a></li>
-            <li><a href="/api/system-info">📡 API</a></li>
-            <li><a href="/test">🧪 اختبار</a></li>
-        </ul>
-        <p>السيرفر يعمل 🚀</p>
-        <p>التوكن: <code>medo123</code></p>
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>🚀 Integrity Server</title>
+            <style>
+                body { font-family: Arial; background: #0d0d0d; color: #fff; padding: 30px; }
+                h1 { color: #00e676; }
+                a { color: #00e676; text-decoration: none; }
+                a:hover { text-decoration: underline; }
+                .box { background: #1a1a2e; padding: 20px; border-radius: 10px; margin: 10px 0; }
+                .status { color: #00e676; }
+            </style>
+        </head>
+        <body>
+            <h1>🚀 Integrity Server</h1>
+            <div class="box">
+                <h3>📊 الروابط:</h3>
+                <ul>
+                    <li><a href="/system-info">📊 معلومات النظام</a></li>
+                    <li><a href="/api/system-info">📡 API - معلومات النظام</a></li>
+                    <li><a href="/test">🧪 اختبار السيرفر</a></li>
+                </ul>
+            </div>
+            <div class="box">
+                <p>✅ السيرفر يعمل على <strong>Railway</strong></p>
+                <p>🔑 التوكن: <code style="background:#333;padding:2px 8px;border-radius:4px;">medo123</code></p>
+            </div>
+        </body>
+        </html>
     `);
 });
 
@@ -131,7 +158,7 @@ app.get("/", (req, res) => {
 // ============================================================
 app.listen(PORT, "0.0.0.0", () => {
     console.log(`\n🚀 السيرفر يعمل على port ${PORT}`);
-    console.log(`📊 http://localhost:${PORT}/system-info`);
-    console.log(`📡 http://localhost:${PORT}/api/system-info`);
-    console.log(`🧪 http://localhost:${PORT}/test\n`);
+    console.log(`📊 /system-info`);
+    console.log(`📡 /api/system-info`);
+    console.log(`🧪 /test\n`);
 });
