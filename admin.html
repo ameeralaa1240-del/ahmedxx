@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>لوحة تحكم الهاش</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #1a1a1a; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .card { background: #2d2d2d; padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 400px; }
+        h2 { text-align: center; color: #4caf50; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 5px; border: 1px solid #444; background: #1a1a1a; color: white; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background: #4caf50; border: none; color: white; font-weight: bold; border-radius: 5px; cursor: pointer; transition: 0.3s; }
+        button:hover { background: #45a049; }
+        .status { margin-top: 20px; padding: 10px; border-radius: 5px; text-align: center; font-size: 14px; }
+        .current-hash { word-break: break-all; color: #ffa500; background: #111; padding: 10px; margin-top: 10px; border-radius: 5px; font-family: monospace; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>تحديث الهاش (Integrity)</h2>
+    
+    <label>التوكن (Admin Token):</label>
+    <input type="password" id="token" placeholder="أدخل التوكن هنا" value="medo123">
+
+    <label>الهاش الجديد (MD5):</label>
+    <input type="text" id="newHash" placeholder="أدخل الهاش الجديد">
+
+    <button onclick="updateHash()">تحديث الهاش الآن</button>
+
+    <div id="msg" class="status"></div>
+    
+    <div style="margin-top: 20px;">
+        <strong>الهاش الحالي في السيرفر:</strong>
+        <div id="currentHash" class="current-hash">جاري التحميل...</div>
+    </div>
+</div>
+
+<script>
+    const API_URL = 'http://localhost:3000/integrity';
+
+    // وظيفة لجلب الهاش الحالي عند فتح الصفحة
+    async function fetchCurrentHash() {
+        try {
+            const response = await fetch(API_URL);
+            const data = await response.json();
+            document.getElementById('currentHash').innerText = data.hash || 'لا يوجد هاش مخزن';
+        } catch (err) {
+            document.getElementById('currentHash').innerText = 'خطأ في الاتصال بالسيرفر';
+        }
+    }
+
+    // وظيفة لتحديث الهاش
+    async function updateHash() {
+        const hash = document.getElementById('newHash').value;
+        const token = document.getElementById('token').value;
+        const msgDiv = document.getElementById('msg');
+
+        if(!hash) { alert('يرجى إدخال الهاش'); return; }
+
+        try {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': token
+                },
+                body: JSON.stringify({ hash: hash })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                msgDiv.style.color = '#4caf50';
+                msgDiv.innerText = 'تم التحديث بنجاح ✅';
+                fetchCurrentHash(); // تحديث العرض
+            } else {
+                msgDiv.style.color = '#f44336';
+                msgDiv.innerText = 'فشل التحديث: ' + (data.error || 'خطأ غير معروف');
+            }
+        } catch (err) {
+            msgDiv.style.color = '#f44336';
+            msgDiv.innerText = 'خطأ: السيرفر لا يستجيب';
+        }
+    }
+
+    // جلب الهاش عند تشغيل الصفحة
+    fetchCurrentHash();
+</script>
+
+</body>
+</html>
