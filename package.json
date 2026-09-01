@@ -1,15 +1,15 @@
 {
   "name": "integrity-server",
   "version": "1.0.0",
-  "description": "MD5 integrity API using Express and Redis",
+  "description": "سيرفر معلومات النظام",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
-    "dotenv": "^17.4.2",
-    "express": "^5.1.0",
-    "redis": "^5.8.2",
-    "cors": "^2.8.5"
+    "express": "^4.18.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }
